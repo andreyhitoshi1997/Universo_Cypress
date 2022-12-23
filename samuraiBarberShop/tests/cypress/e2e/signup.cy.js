@@ -1,6 +1,26 @@
 import signupPage from '../support/pages/signup'
 
 describe('Cadastro', () => {
+        
+    context.skip('Quando o email ja existe', () => {
+        const user = {
+            nome: "João Lucas",
+            email: "Raquel.Sanford@gmail.com",
+            senha: "pwd123",
+            is_provider: true
+        }
+
+        before(() => {
+            cy.postUser(user)
+        });
+
+        it('Deve exibir email ja cadastrado', () => {
+            signupPage.go()
+            signupPage.form(user)
+            signupPage.submit()
+            signupPage.toast.shouldHaveText('Email já cadastrado para outro usuário.')    
+        });
+    });
 
     context('Quando o usuário é novato', () => {
         const user = {
@@ -31,39 +51,6 @@ describe('Cadastro', () => {
             // cy.wait(1000)
             // cy.get('body')
         });
-    });
-
-    
-
-    it.skip('Deve exibir email ja cadastrado', () => {
-        
-        const user = {
-            nome: 'João Lucas',
-            is_provider: true,
-            email: 'Raquel.Sanford@gmail.com',
-            senha: 'pwd123'
-        }
-
-        cy.task('removeUser', user.email)
-            .then((result) => {
-                console.log(result)
-        })
-
-        cy.request(
-            'POST',
-            'http://localhost:3333/users',
-            user
-        ).then((response) => {
-            expect(response).to.eq(200)
-        })
-        
-            signupPage.go()
-            signupPage.form(user)
-            signupPage.submit()
-            signupPage.toast.shouldHaveText('Email já cadastrado para outro usuário.')    
-      
-        // cy.wait(1000)
-        // cy.get('body')
     });
 
     context('Quando o email é incorreto', () => {
