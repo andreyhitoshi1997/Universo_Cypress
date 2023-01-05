@@ -37,4 +37,35 @@ Cypress.Commands.add('postUser', function(user) {
     ).then((response) => {
         expect(response.status).to.eq(200)
     })
+}),
+
+Cypress.Commands.add('recoveryPass', function(email) {
+    cy.request(
+        'POST',
+        'http://localhost:3333/password/forgot',
+        {email: email}
+    ).then((response) => {
+        expect(response.status).to.eq(204)
+
+        cy.task('findToken', email).then(function(result){
+            // console.log(result.token)
+            Cypress.env('recoveryToken', result.token)
+        })
+    })
+}),
+
+Cypress.Commands.add('apiLogin', function(user) {
+    const payload = {
+        email: user.email,
+        password: user.password
+    }
+
+    cy.request(
+        'POST',
+        "http://localhost:3333/sessions",
+        payload
+    ).then(function (response) {
+        expect(response.status).to.eq(200)
+        Cypress.env('apiToken', response.body.token)
+    })
 })

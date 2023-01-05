@@ -51,7 +51,7 @@ describe('Login', () => {
 
     context('Quando o formato de email é inválido ', () => {
 
-        const email = [ 
+        const emails = [ 
             'papito.com.br',
             'yahoo.com',
             '@gmail.com',
@@ -66,7 +66,7 @@ describe('Login', () => {
         //     loginPage.go()
         //  });
 
-         email.forEach((email) => {
+         emails.forEach((email) => {
             it('Não deve logar com o email: ' + email, () => {
                 const user = {email: email,password: 'pwd123'}
 

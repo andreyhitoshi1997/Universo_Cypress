@@ -1,6 +1,12 @@
 import signupPage from '../support/pages/signup'
 
 describe('Cadastro', () => {
+
+    // before(() => {
+    //     cy.fixture('papito').then((papito) => {
+    //         this.papito = papito
+    //     })
+    // });
         
     context.skip('Quando o email ja existe', () => {
         const user = {
