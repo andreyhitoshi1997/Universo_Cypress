@@ -37,7 +37,7 @@ Cypress.Commands.add('postUser', function(user) {
     ).then((response) => {
         expect(response.status).to.eq(200)
     })
-}),
+})
 
 Cypress.Commands.add('recoveryPass', function(email) {
     cy.request(
@@ -52,7 +52,27 @@ Cypress.Commands.add('recoveryPass', function(email) {
             Cypress.env('recoveryToken', result.token)
         })
     })
-}),
+})
+
+Cypress.Commands.add('setProviderId', function(providerEmail){
+    cy.request({
+        method: 'GET',
+        url: 'http://localhost:3333/providers',
+        headers: {
+            authorization: 'Bearer ' + Cypress.env('apiToken')
+        }
+    }).then(function(response){
+        expect(response.status).to.eq(200)
+        
+        const providerList = response.body
+
+        providerList.forEach((provider)=> {
+            if(provider.email === providerEmail){
+                Cypress.env('providerId', provider.id)
+            }
+        })
+    })
+})
 
 Cypress.Commands.add('apiLogin', function(user) {
     const payload = {
@@ -60,12 +80,39 @@ Cypress.Commands.add('apiLogin', function(user) {
         password: user.password
     }
 
-    cy.request(
-        'POST',
-        "http://localhost:3333/sessions",
-        payload
-    ).then(function (response) {
+    cy.request({
+        method: 'POST',
+        url: "http://localhost:3333/sessions",
+        body: payload
+    }).then(function (response) {
         expect(response.status).to.eq(200)
         Cypress.env('apiToken', response.body.token)
+    })
+})
+
+import moment from 'moment'
+
+Cypress.Commands.add('createAppointment', function(hour) {
+    let now = new Date()
+    now.setDate(now.getDate() + 2)
+
+    Cypress.env('appointmentDay', now.getDate())
+
+    const date = moment(now).format('YYYY-MM-DD ' + hour + ":00")    
+    const payload = {
+         provider_id: Cypress.env('providerId'),
+         date: date
+    }
+
+    cy.request({
+        method:'POST',
+        url:"http://localhost:3333/appointments",
+        body: payload,
+        headers: {
+            authorization: 'Bearer ' + Cypress.env('apiToken')
+        }
+    }).then((response) => {
+        expect(response.status).to.eq(200)
+
     })
 })
