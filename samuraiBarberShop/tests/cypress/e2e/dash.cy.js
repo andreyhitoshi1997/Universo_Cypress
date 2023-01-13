@@ -1,51 +1,35 @@
-import loginPage from '../support/pages/login'
 import dashPage from '../support/pages/dash';
+
+import { customer, provider, appointment } from '../support/factories/dash';
 
 describe('Dashboard', () =>  {
     context('Quando o cliente faz um agendamento no app mobile', () => {
-        const data = {
-            customer: {
-                name: "Nikki Sixx",
-                email: "sixx@motleycrue.com",
-                password: "pwd123",
-                is_provider: false
-            },
-            provider: {
-                name: "Ramon Valdez",
-                email: "ramon@televisa.com",
-                password: "pwd123",
-                is_provider: true
-            },
-            appointmentHour: '14:00'
-        }
+        
 
         before(() =>  {
-            cy.postUser(data.customer)
-            cy.postUser(data.provider)
+            cy.postUser(customer)
+            cy.postUser(provider)
 
-            cy.apiLogin(data.customer).then(function(){
+            cy.apiLogin(customer).then(function(){
                 Cypress.env('apiToken')
             })
 
-            cy.setProviderId(data.provider.email).then(function(){
+            cy.setProviderId(provider.email).then(function(){
                 Cypress.env('providerId')
-            })           
+            })                       
 
-            cy.createAppointment(data.appointmentHour)
+            cy.createAppointment(appointment.hour)
         });
         
 
         it('Então deve ser exibido no Dashboard', () =>  {
-            loginPage.go()
-            loginPage.form(data.provider)
-            loginPage.submit()
+            const day = Cypress.env('appointmentDay')
 
+            cy.uiLogin(provider)
 
             dashPage.calendarShouldBeVisible()
-
-            const day = Cypress.env('appointmentDay')
             dashPage.selectDay(day)
-            dashPage.appointmentShouldBe(data.customer, data.appointmentHour)
+            dashPage.appointmentShouldBe(customer, appointment.hour)
         });
     });
 });
